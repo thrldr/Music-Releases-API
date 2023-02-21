@@ -37,7 +37,7 @@ class RegistrationController extends AbstractController
         return $this->json(["users" => $usersArray]);
     }
 
-    #[Route(path: "/register", methods: ["post", "get"])]
+    #[Route(path: "/register", methods: ["post"])]
     public function index(
         Request $request,
         UserPasswordHasherInterface $hasher,
@@ -45,16 +45,16 @@ class RegistrationController extends AbstractController
         ValidatorInterface $validator,
     ): Response
     {
-        $post = $request->query;
+        $data = $request->toArray();
+        $email = $data["email"];
+        $plainPassword = $data["password"];
+        $notificationServices = $data["notification services"] ?? 0;
 
         try {
-            $email = $post->get("email");
-            $plainPassword = $post->get("password");
             if (!isset($email) or !isset($plainPassword)) {
                 throw(new \InvalidArgumentException(self::INSUFFICIENT_DATA_MESSAGE));
             }
 
-            $notificationServices = $post->getInt("notification services");
             $user = new User($email, $plainPassword, $notificationServices);
 
             $hashedPassword = $hasher->hashPassword($user, $user->getPlainPassword());
