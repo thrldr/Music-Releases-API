@@ -3,7 +3,6 @@
 namespace App\Services\Notifier;
 
 use App\Entity\User;
-use App\Services\App;
 
 class NotificationServicesPasrser
 {
