@@ -16,26 +16,6 @@ class RegistrationController extends AbstractController
     const SUCCESSFUL_REGISTRATION_MESSAGE = "User successfully registered";
     const INSUFFICIENT_DATA_MESSAGE = "You must provide a valid email and password to register";
 
-    #[Route("/clear")]
-    public function clear(UserRepository $userRepository): Response
-    {
-        $users = $userRepository->findAll();
-        foreach ($users as $user) {
-            $userRepository->remove($user, true);
-        }
-        return $this->json(["message" => "all useres are removed"]);
-    }
-
-    #[Route("/users")]
-    public function users(UserRepository $userRepository): Response
-    {
-        $useres = $userRepository->findAll();
-        $usersArray = [];
-        foreach ($useres as $user) {
-            $usersArray[] = $user->getEmail();
-        }
-        return $this->json(["users" => $usersArray]);
-    }
 
     #[Route(path: "/register", methods: ["post"])]
     public function index(
