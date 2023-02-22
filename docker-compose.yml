@@ -5,7 +5,7 @@ services:
   database:
     env_file:
       - ./.env
-      - ./.env.local
+      - .env.dev
     image: postgres:${POSTGRES_VERSION:-15}-alpine
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-app}

@@ -40,7 +40,6 @@ class BandController extends AbstractController
 
     /** create a new band */
     #[Route(path: "/band", methods: ["post"])]
-//    #[Route(path: "/band", methods: ["get"])]
     public function create(
         Request $request,
         BandRepository $bandRepository,
@@ -69,6 +68,7 @@ class BandController extends AbstractController
         return $this->json(data: self::BAND_CREATED_MESSAGE, status: 201);
     }
 
+    /** delete a band */
     #[Route(path: "/band", methods: "delete")]
     public function delete(
         Request $request,

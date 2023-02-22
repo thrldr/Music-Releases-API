@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Services\Notifier;
+namespace App\Services\Notifiers\Parser;
 
 use App\Entity\User;
+use App\Services\Notifiers\NotificationServiceInterface;
 
-class NotificationServicesParser
+class UserNotificationServicesParser
 {
     const EMAIL = 1;
     const TELEGRAM = 2;
 
-    /** @return NotifierServiceInterface[] */
-    public function parseUserNotificationServices(User $user): array
+    /** @return NotificationServiceInterface[] */
+    public function parseNotificationServices(User $user): array
     {
         $binaryServices = $user->getNotificationServices();
         $notifierServices = [];
