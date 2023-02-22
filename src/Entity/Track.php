@@ -22,6 +22,10 @@ class Track
     #[ORM\Column]
     private ?int $albumId = null;
 
+    #[ORM\ManyToOne(inversedBy: 'tracks')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Album $album = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -59,6 +63,18 @@ class Track
     public function setAlbumId(int $albumId): self
     {
         $this->albumId = $albumId;
+
+        return $this;
+    }
+
+    public function getAlbum(): ?Album
+    {
+        return $this->album;
+    }
+
+    public function setAlbum(?Album $album): self
+    {
+        $this->album = $album;
 
         return $this;
     }

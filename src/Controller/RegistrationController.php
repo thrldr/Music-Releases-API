@@ -7,6 +7,7 @@ use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -15,7 +16,6 @@ class RegistrationController extends AbstractController
 {
     const SUCCESSFUL_REGISTRATION_MESSAGE = "User successfully registered";
     const INSUFFICIENT_DATA_MESSAGE = "You must provide a valid email and password to register";
-
 
     #[Route(path: "/register", methods: ["post"])]
     public function index(

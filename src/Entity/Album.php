@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\AlbumRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -23,11 +25,16 @@ class Album
     #[ORM\Column]
     private ?int $duration = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $type = null;
+    #[ORM\OneToMany(mappedBy: 'album', targetEntity: Track::class, orphanRemoval: true)]
+    private Collection $tracks;
 
-    #[ORM\Column]
-    private ?int $bandId = null;
+    public function __construct(string $name, \DateTime $releaseDate, int $duration)
+    {
+        $this->name = $name;
+        $this->releaseDate = $releaseDate;
+        $this->tracks = new ArrayCollection();
+        $this->duration = $duration;
+    }
 
     public function getId(): ?int
     {
@@ -70,14 +77,32 @@ class Album
         return $this;
     }
 
-    public function getType(): ?string
+    /**
+     * @return Collection<int, Track>
+     */
+    public function getTracks(): Collection
     {
-        return $this->type;
+        return $this->tracks;
     }
 
-    public function setType(string $type): self
+    public function addTrack(Track $track): self
     {
-        $this->type = $type;
+        if (!$this->tracks->contains($track)) {
+            $this->tracks->add($track);
+            $track->setAlbum($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTrack(Track $track): self
+    {
+        if ($this->tracks->removeElement($track)) {
+            // set the owning side to null (unless already changed)
+            if ($track->getAlbum() === $this) {
+                $track->setAlbum(null);
+            }
+        }
 
         return $this;
     }

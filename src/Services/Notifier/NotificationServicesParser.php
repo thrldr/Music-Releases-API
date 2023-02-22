@@ -4,7 +4,7 @@ namespace App\Services\Notifier;
 
 use App\Entity\User;
 
-class NotificationServicesPasrser
+class NotificationServicesParser
 {
     const EMAIL = 1;
     const TELEGRAM = 2;
