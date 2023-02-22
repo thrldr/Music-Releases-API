@@ -2,36 +2,72 @@
 
 namespace App\Controller;
 
+use App\Entity\Band;
+use App\Entity\User;
+use App\Repository\BandRepository;
 use App\Repository\UserRepository;
-use App\Services\Notifiers\Parser\UserNotificationServicesParser;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class UserController extends AbstractController
 {
-    const SUCCESSFUL_REMOVAL_MESSAGE = "all users are removed";
+    const ALL_USERS_REMOVED_MESSAGE = "all users are removed";
+    const USER_SUBSCRIBED_BAND_MESSAGE = "user subscribed to a band";
+    const NO_SUCH_BAND_MESSAGE = "no band under this name";
+
+    public function __construct(
+        private UserRepository $userRepository,
+        private BandRepository $bandRepository,
+    )
+    {
+    }
 
     /** deletes all users */
     #[Route(path: "/users", methods: ["delete"])]
-    public function clear(UserRepository $userRepository): Response
+    public function clear(): Response
     {
-        $users = $userRepository->findAll();
+        $users = $this->userRepository->findAll();
         foreach ($users as $user) {
-            $userRepository->remove($user, true);
+            $this->userRepository->remove($user, true);
         }
-        return $this->json(["message" => self::SUCCESSFUL_REMOVAL_MESSAGE]);
+        return $this->json(["message" => self::ALL_USERS_REMOVED_MESSAGE]);
     }
 
-    /** lists all users */
+    /** lists all users and their bands */
     #[Route(path: "/users", methods: ["get"])]
-    public function users(UserRepository $userRepository): Response
+    public function users(): Response
     {
-        $useres = $userRepository->findAll();
+        $useres = $this->userRepository->findAll();
         $usersArray = [];
         foreach ($useres as $user) {
-            $usersArray[] = $user->getEmail();
+            $bands = $user->getSubscribedBands();
+            $bandStrings = array_map((fn(Band $band) => $band->getName()), $bands->toArray());
+            $usersArray[] = [$user->getEmail(), $bandStrings];
         }
         return $this->json(["users" => $usersArray]);
+    }
+
+    #[Route(path: "user", methods: ["patch"])]
+    public function registerGroup(
+        Request $request,
+    ): Response
+    {
+        $data = $request->toArray();
+        $bandName = $data["band-name"];
+        $band = $this->bandRepository->findOneBy(["name" => $bandName]);
+        if (!isset($band)) {
+            return $this->json(["message" => self::NO_SUCH_BAND_MESSAGE], 400);
+        }
+
+        // TODO: add user retrieval from session
+//        /** @var User $user */
+//        $user = $this->getUser();
+        $user = $this->userRepository->findOneBy(["email" => "test@mail.com"]);
+        $user->addSubscribedBand($band);
+
+        $this->userRepository->save($user, true);
+        return $this->json(["message" => self::USER_SUBSCRIBED_BAND_MESSAGE]);
     }
 }

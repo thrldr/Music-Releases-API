@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -36,13 +38,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * a binary array of notification services
-     * @see App\Services\Notifier\NotificationServicesParser
+     * @see App\Services\Notifiers\Parser\UserNotificationServicesParser
      */
     #[ORM\Column]
     private int $notificationServices = 0;
 
     #[ORM\Column(type: 'json')]
     private $roles = [];
+
+    #[ORM\ManyToMany(targetEntity: Band::class, inversedBy: 'subscribedUsers')]
+    #[Assert\Unique]
+    private Collection $subscribedBands;
 
     public function __construct(
         string $email,
@@ -53,6 +59,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->email = $email;
         $this->plainPassword = $plainPassword;
         $this->notificationServices = $notificationServices;
+        $this->subscribedBands = new ArrayCollection();
     }
 
     public function getPlainPassword()
@@ -127,5 +134,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials()
     {
         $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, Band>
+     */
+    public function getSubscribedBands(): Collection
+    {
+        return $this->subscribedBands;
+    }
+
+    public function addSubscribedBand(Band $subscribedBand): self
+    {
+        if (!$this->subscribedBands->contains($subscribedBand)) {
+            $this->subscribedBands->add($subscribedBand);
+        }
+
+        return $this;
+    }
+
+    public function removeSubscribedBand(Band $subscribedBand): self
+    {
+        $this->subscribedBands->removeElement($subscribedBand);
+
+        return $this;
     }
 }

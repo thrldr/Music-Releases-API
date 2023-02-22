@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\BandRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -24,9 +26,13 @@ class Band
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Album $previousAlbum = null;
 
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'subscribedBands')]
+    private Collection $subscribedUsers;
+
     public function __construct(string $name)
     {
         $this->name = $name;
+        $this->subscribedUsers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -74,5 +80,32 @@ class Band
     {
         $this->previousAlbum = $this->lastAlbum;
         $this->lastAlbum = $album;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getSubscribedUsers(): Collection
+    {
+        return $this->subscribedUsers;
+    }
+
+    public function addSubscribedUser(User $subscribedUser): self
+    {
+        if (!$this->subscribedUsers->contains($subscribedUser)) {
+            $this->subscribedUsers->add($subscribedUser);
+            $subscribedUser->addSubscribedBand($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubscribedUser(User $subscribedUser): self
+    {
+        if ($this->subscribedUsers->removeElement($subscribedUser)) {
+            $subscribedUser->removeSubscribedBand($this);
+        }
+
+        return $this;
     }
 }
