@@ -15,6 +15,7 @@ class BandController extends AbstractController
 {
     const WRONG_BAND_NAME_MESSAGE = "Sorry, there's no band under that name";
     const BAND_CREATED_MESSAGE = "Band successfully created";
+    const BAND_DELETED_MESSAGE = "Band successfully deleted";
 
     public function __construct(private BandRepository $bandRepository)
     {
@@ -66,5 +67,18 @@ class BandController extends AbstractController
 
         $bandRepository->save($band, true);
         return $this->json(data: self::BAND_CREATED_MESSAGE, status: 201);
+    }
+
+    #[Route(path: "/band", methods: "delete")]
+    public function delete(
+        Request $request,
+        BandRepository $bandRepository,
+    )
+    {
+        $data = $request->toArray();
+        $bandName = $data["name"];
+        $band = $bandRepository->findOneBy(["name" => $bandName]);
+        $bandRepository->remove($band, true);
+        return $this->json(["message" => self::BAND_DELETED_MESSAGE]);
     }
 }

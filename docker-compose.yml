@@ -3,6 +3,9 @@ version: '3'
 services:
 ###> doctrine/doctrine-bundle ###
   database:
+    env_file:
+      - ./.env
+      - ./.env.local
     image: postgres:${POSTGRES_VERSION:-15}-alpine
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-app}
