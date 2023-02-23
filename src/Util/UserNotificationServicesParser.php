@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Services\Notifiers\Parser;
+namespace App\Util;
 
 use App\Entity\User;
-use App\Services\Notifiers\NotificationServiceInterface;
+use App\Service\Notifier\NotificationServiceInterface;
 
 class UserNotificationServicesParser
 {

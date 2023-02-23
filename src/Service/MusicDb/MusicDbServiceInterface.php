@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\MusicDb;
+namespace App\Service\MusicDb;
 
 use App\Entity\Album;
 use App\Entity\Band;

@@ -21,3 +21,5 @@
 
 .idea/
 .env.dev
+.env.local
+.env.local.php

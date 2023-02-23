@@ -22,3 +22,8 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    app.music_db.mock:
+        class: App\Service\MusicDb\MockMusicDbService
+
+    App\Service\MusicDb\MusicDbServiceInterface: '@app.music_db.mock'
