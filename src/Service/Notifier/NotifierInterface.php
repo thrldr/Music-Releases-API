@@ -2,7 +2,7 @@
 
 namespace App\Service\Notifier;
 
-interface NotificationServiceInterface
+interface NotifierInterface
 {
     function notify(mixed $payload);
 }
