@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BandRepository::class)]
 #[UniqueEntity(fields: ["name"])]
@@ -18,6 +19,7 @@ class Band
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups("band")]
     private ?string $name = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]

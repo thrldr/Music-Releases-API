@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Band;
 use App\Repository\BandRepository;
-use App\Services\MusicDb\MusicDbServiceInterface;
+use App\Service\MusicDb\MusicDbServiceInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,16 +22,25 @@ class BandController extends AbstractController
     }
 
     /** get list of bands (based on user id or not) */
-    #[Route(path: "/bands", methods: ["get"])]
-    public function bands(?int $userId): Response
+    #[Route(path: "/bands/{id}", methods: ["get"])]
+    public function bands(?int $id = null): Response
     {
-        if (!isset($userId)) {
+        if (!isset($id)) {
             $bands = $this->bandRepository->findAll();
-            $bandsArray = [];
+            $serializedBands = [];
+
             foreach ($bands as $band) {
-                $bandsArray[] = $band;
+                $subscribers = $band->getSubscribedUsers();
+
+                $subscribersArray = [];
+                foreach ($subscribers as $subscriber) {
+                    $subscribersArray[] = $subscriber->getEmail();
+                }
+                $serializedBands[] = [
+                    $band->getName() => $subscribersArray,
+                ];
             }
-            return $this->json($bandsArray);
+            return $this->json($serializedBands);
         }
 
         // TODO: add a response based on a user id

@@ -35,18 +35,24 @@ class UserController extends AbstractController
         return $this->json(["message" => self::ALL_USERS_REMOVED_MESSAGE]);
     }
 
+    /** lists the authenticated user's bands */
+    #[Route(path: "/user", methods: ["get"])]
+    public function user(): Response
+    {
+        $user = $this->getUser();
+        $bands = $user->getSubscribedBands();
+        $bandsArray = array_map((fn(Band $band) => $band->getName()), $bands->toArray());
+        return $this->json([$user->getEmail() => $bandsArray]);
+    }
+
     /** lists all users and their bands */
     #[Route(path: "/users", methods: ["get"])]
     public function users(): Response
     {
-        $useres = $this->userRepository->findAll();
-        $usersArray = [];
-        foreach ($useres as $user) {
-            $bands = $user->getSubscribedBands();
-            $bandStrings = array_map((fn(Band $band) => $band->getName()), $bands->toArray());
-            $usersArray[] = [$user->getEmail(), $bandStrings];
-        }
-        return $this->json(["users" => $usersArray]);
+        $users = $this->userRepository->findAll();
+        return $this->json($users, Response::HTTP_OK,
+            context: ['groups' => ['band']]
+        );
     }
 
     #[Route(path: "user", methods: ["patch"])]
@@ -55,7 +61,9 @@ class UserController extends AbstractController
     ): Response
     {
         $data = $request->toArray();
-        $user = $this->userRepository->findOneBy(["email" => "test@mail.com"]);
+
+        /** @var User $user */
+        $user = $this->getUser();
 
         $newServices = $data["notifiers"] ?? $user->getNotificationServices();
         $user->setNotificationServices($newServices);
@@ -68,10 +76,6 @@ class UserController extends AbstractController
             }
             $user->addSubscribedBand($band);
         }
-
-//        TODO: add user retrieval from session
-//        /** @var User $user */
-//        $user = $this->getUser();
 
         $this->userRepository->save($user, true);
         return $this->json(["message" => self::USER_SUBSCRIBED_BAND_MESSAGE]);

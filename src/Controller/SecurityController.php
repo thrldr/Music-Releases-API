@@ -7,18 +7,18 @@ use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class RegistrationController extends AbstractController
+class SecurityController extends AbstractController
 {
     const SUCCESSFUL_REGISTRATION_MESSAGE = "User successfully registered";
     const INSUFFICIENT_DATA_MESSAGE = "You must provide a valid email and password to register";
 
     #[Route(path: "/register", methods: ["post"])]
-    public function index(
+    public function register(
         Request $request,
         UserPasswordHasherInterface $hasher,
         UserRepository $userRepository,
@@ -47,14 +47,14 @@ class RegistrationController extends AbstractController
 
             $user->eraseCredentials();
             $userRepository->save($user, true);
-            $statusCode = 201;
+            $statusCode = Response::HTTP_CREATED;
             $responseData = self::SUCCESSFUL_REGISTRATION_MESSAGE;
 
         } catch (\InvalidArgumentException $exception) {
-            $statusCode = 400;
+            $statusCode = Response::HTTP_BAD_REQUEST;
             $responseData = $exception->getMessage();
         } catch (\Exception $exception) {
-            $statusCode = 500;
+            $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
             $responseData = $exception->getMessage();
         }
 
