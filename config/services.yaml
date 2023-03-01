@@ -26,8 +26,7 @@ services:
     App\Service\Notifier\EmailNotifier:
         arguments:
             $from: '%env(EMAIL_FROM)%'
-            $to: ${EMAIL_TO}
-            $subject: ${EMAIL_SUBJECT}
+            $subject: '%env(EMAIL_SUBJECT)%'
 
     app.music_db.mock:
         class: App\Service\MusicDb\MockMusicDbService

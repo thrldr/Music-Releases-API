@@ -25,14 +25,6 @@ class UserController extends AbstractController
     {
     }
 
-    #[Route("/send-email")]
-    public function sendMail(EmailNotifier $emailNotifier): Response
-    {
-        $emailNotifier->notify("lol");
-
-        return new Response("ok");
-    }
-
     /** deletes all users */
     #[Route(path: "/users", methods: ["delete"])]
     public function clear(): Response
@@ -58,7 +50,7 @@ class UserController extends AbstractController
     #[Route(path: "/users", methods: ["get"])]
     public function users(): Response
     {
-        $users = $this->userRepository->findAll();
+        $users = $this->userRepository->fetchAll();
         return $this->json($users, Response::HTTP_OK,
             context: ['groups' => ['band']]
         );
@@ -74,8 +66,8 @@ class UserController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $newServices = $data["notifiers"] ?? $user->getNotificationServices();
-        $user->setNotificationServices($newServices);
+        $newServices = $data["notifiers"] ?? $user->getNotifiers();
+        $user->setNotifiers($newServices);
 
         $bandNames = $data["band-names"] ?? [];
         foreach ($bandNames as $bandName) {

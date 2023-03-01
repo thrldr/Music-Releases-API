@@ -3,21 +3,22 @@
 namespace App\Util;
 
 use App\Entity\User;
+use App\Service\Notifier\EmailNotifier;
 use App\Service\Notifier\NotifierInterface;
 
-class UserNotificationServicesParser
+class UserNotifiersParser
 {
     const EMAIL = 1;
     const TELEGRAM = 2;
 
     /** @return NotifierInterface[] */
-    public function parseNotificationServices(User $user): array
+    public function parseNotifiers(User $user): array
     {
-        $binaryServices = $user->getNotificationServices();
+        $binaryServices = $user->getNotifiers();
         $notifierServices = [];
 
         if ($binaryServices & self::EMAIL) {
-//            $notifierServices[] = new EmailNotifier();
+            $notifierServices[] = new EmailNotifier();
         }
 
         if ($binaryServices & self::TELEGRAM) {

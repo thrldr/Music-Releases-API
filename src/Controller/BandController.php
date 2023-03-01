@@ -59,7 +59,7 @@ class BandController extends AbstractController
         $data = $request->toArray();
         $bandName = $data["name"];
 
-        if (!$musicDbServiceService->bandNameInDb($bandName)) {
+        if (!$musicDbServiceService->bandInDb($bandName)) {
             $this->json(data: ["message" => self::WRONG_BAND_NAME_MESSAGE], status: 400);
         }
 

@@ -11,9 +11,9 @@ class MockMusicDbService implements MusicDbServiceInterface
 {
     const MOCK_DB = ["Burzum", "Aphex Twin", "Miles Davis", "Black Sabbath"];
 
-    public function bandNameInDb(string $name): bool
+    public function bandInDb(Band $band): bool
     {
-        return in_array($name, self::MOCK_DB);
+        return in_array($band->getName(), self::MOCK_DB);
     }
 
     /** retrieves the latest release by a band */

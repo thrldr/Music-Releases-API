@@ -39,6 +39,16 @@ class BandRepository extends ServiceEntityRepository
         }
     }
 
+    /** @return Band[] */
+    public function fetchAll(): array
+    {
+        return $this->createQueryBuilder('bands')
+            ->innerJoin('bands.subscribedUsers', 'users')
+            ->addSelect('users')
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Band[] Returns an array of Band objects
 //     */

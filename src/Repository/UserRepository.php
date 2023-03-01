@@ -21,6 +21,26 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
+    public function fetchUnnotified(): array
+    {
+        return $this->createQueryBuilder('users')
+            ->innerJoin('users.subscribedBands', 'bands')
+            ->addSelect('bands')
+            ->andWhere(['users.notified = :notified'])
+            ->setParameter("notified", false)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function fetchAll(): array
+    {
+        return $this->createQueryBuilder('users')
+            ->innerJoin('users.subscribedBands', 'bands')
+            ->addSelect('bands')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function save(User $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
@@ -51,16 +71,6 @@ class UserRepository extends ServiceEntityRepository
 //            ->setMaxResults(10)
 //            ->getQuery()
 //            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?User
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
 //        ;
 //    }
 }

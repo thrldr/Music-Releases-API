@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
-use App\Security\Roles;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -31,6 +30,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
+    #[ORM\Column(name: "notified")]
+    private ?bool $notified = null;
+
     #[Assert\Length(
         min: 5,
         max: 50,
@@ -40,11 +42,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $plainPassword = null;
 
     /**
-     * a binary array of notification services
+     * a binary array of notifiers
      * @see App\Services\Notifiers\Parser\UserNotificationServicesParser
      */
-    #[ORM\Column]
-    private int $notificationServices = 0;
+    #[ORM\Column(name: "notifiers", type: 'integer')]
+    private int $notifiers = 0;
 
     #[ORM\Column(type: 'json')]
     private $roles = [];
@@ -57,13 +59,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct(
         string $email,
         string $plainPassword,
-        int $notificationServices = 0,
+        int    $notifiers = 0,
     )
     {
         $this->email = $email;
         $this->plainPassword = $plainPassword;
-        $this->notificationServices = $notificationServices;
+        $this->notifiers = $notifiers;
         $this->subscribedBands = new ArrayCollection();
+    }
+
+    public function setNotified(bool $needsNotification): self
+    {
+        $this->notified = $needsNotification;
+        return $this;
+    }
+
+    public function needsNotification(): bool
+    {
+        return !$this->notified;
     }
 
     public function getPlainPassword()
@@ -108,14 +121,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getNotificationServices(): ?int
+    public function getNotifiers(): ?int
     {
-        return $this->notificationServices;
+        return $this->notifiers;
     }
 
-    public function setNotificationServices(int $notificationServices): self
+    public function setNotifiers(int $notifiers): self
     {
-        $this->notificationServices = $notificationServices;
+        $this->notifiers = $notifiers;
 
         return $this;
     }
@@ -126,13 +139,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
         return array_unique($roles);
-    }
-
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
-
-        return $this;
     }
 
     public function addRole(string $role): self

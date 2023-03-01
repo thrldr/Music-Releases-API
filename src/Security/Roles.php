@@ -7,7 +7,7 @@ class Roles
     const authenticated = "IS_AUTHENTICATED_FULLY";
     const admin = "ROLE_ADMIN";
 
-    public static function isValid(string $role)
+    public static function isValid(string $role): bool
     {
         $reflection = new \ReflectionClass(self::class);
         $roles = $reflection->getConstants();

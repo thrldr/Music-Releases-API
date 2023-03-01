@@ -66,22 +66,14 @@ class Band
         return $this;
     }
 
-    public function getPreviousAlbum(): ?Album
-    {
-        return $this->previousAlbum;
-    }
-
-    public function setPreviousAlbum(?Album $previousAlbum): self
-    {
-        $this->previousAlbum = $previousAlbum;
-
-        return $this;
-    }
-
     public function updateLatestRelease(Album $album)
     {
         $this->previousAlbum = $this->lastAlbum;
         $this->lastAlbum = $album;
+
+        foreach ($this->subscribedUsers as $subscriber) {
+            $subscriber->setNotified(true);
+        }
     }
 
     /**
