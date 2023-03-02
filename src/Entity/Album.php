@@ -28,12 +28,17 @@ class Album
     #[ORM\OneToMany(mappedBy: 'album', targetEntity: Track::class, orphanRemoval: true)]
     private Collection $tracks;
 
-    public function __construct(string $name, \DateTime $releaseDate, int $duration)
+    public function __construct(
+        string $name,
+        \DateTime $releaseDate,
+        int $duration,
+        ArrayCollection $tracks = new ArrayCollection(),
+    )
     {
         $this->name = $name;
         $this->releaseDate = $releaseDate;
-        $this->tracks = new ArrayCollection();
         $this->duration = $duration;
+        $this->tracks = $tracks;
     }
 
     public function getId(): ?int

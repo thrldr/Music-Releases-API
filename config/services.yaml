@@ -28,6 +28,10 @@ services:
             $from: '%env(EMAIL_FROM)%'
             $subject: '%env(EMAIL_SUBJECT)%'
 
+    App\Service\MusicDb\LastFmDbAdapter:
+        arguments:
+            $api_key: '%env(API_KEY)%'
+
     app.music_db.mock:
         class: App\Service\MusicDb\MockMusicDbService
 
