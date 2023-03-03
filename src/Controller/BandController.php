@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Band;
 use App\Repository\BandRepository;
 use App\Service\MusicDb\MusicDbServiceInterface;
+use App\Service\Notification\NotificationMaker;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

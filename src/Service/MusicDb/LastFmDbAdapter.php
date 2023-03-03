@@ -10,28 +10,10 @@ class LastFmDbAdapter implements MusicDbServiceInterface
 {
     const API_URL = "http://ws.audioscrobbler.com/2.0/";
     public function __construct(
-        private string $api_key,
+        private string $apiKey,
         private HttpClientInterface $httpClient,
     )
     {
-    }
-
-    public function test(string $name)
-    {
-        $lastestAlbums = $this->httpClient->request(
-            "GET",
-            self::API_URL,
-            ["query" => [
-                "method"  => "artist.getTopAlbums",
-                "artist"  => $name,
-                "order"   => "release_date",
-                "limit"   => "1",
-                "api_key" => $this->api_key,
-                "format"  => "json",
-            ]],
-        )->toArray();
-
-        return $lastestAlbums;
     }
 
     public function bandInDb(Band $band): bool
@@ -43,7 +25,7 @@ class LastFmDbAdapter implements MusicDbServiceInterface
                 "method"  => "artist.search",
                 "artist"  => $band->getName(),
                 "limit"   => "1",
-                "api_key" => $this->api_key,
+                "api_key" => $this->apiKey,
                 "format"  => "json",
             ]]
         )->toArray();
@@ -62,7 +44,7 @@ class LastFmDbAdapter implements MusicDbServiceInterface
                 "artist"  => $band->getName(),
                 "order"   => "release_date",
                 "limit"   => "1",
-                "api_key" => $this->api_key,
+                "api_key" => $this->apiKey,
                 "format"  => "json",
             ]],
         )->toArray();

@@ -20,19 +20,14 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
-
-    App\Service\Notifier\EmailNotifier:
+    App\Service\Notification\Notifier\EmailNotifier:
         arguments:
             $from: '%env(EMAIL_FROM)%'
             $subject: '%env(EMAIL_SUBJECT)%'
 
-    App\Service\MusicDb\LastFmDbAdapter:
+    app.music_db.lastfm:
+        class: App\Service\MusicDb\LastFmDbAdapter
         arguments:
-            $api_key: '%env(API_KEY)%'
+            $apiKey: '%env(API_KEY)%'
 
-    app.music_db.mock:
-        class: App\Service\MusicDb\MockMusicDbService
-
-    App\Service\MusicDb\MusicDbServiceInterface: '@app.music_db.mock'
+    App\Service\MusicDb\MusicDbServiceInterface: '@app.music_db.lastfm'

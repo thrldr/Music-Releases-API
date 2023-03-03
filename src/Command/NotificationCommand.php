@@ -3,26 +3,26 @@
 namespace App\Command;
 
 use App\Repository\BandRepository;
-use App\Repository\UserRepository;
-use App\Service\MusicDb\LastFmDbAdapter;
-use App\Service\MusicDb\MusicDbServiceInterface;
+use App\Service\Notification\Notifier\EmailNotifier;
+use App\Service\Notification\Notifier\TelegramNotifier;
 use App\Util\UserNotifiersParser;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 #[AsCommand(
-    name: "app:notify-users",
+    name: "app:notify",
     description: "The command notifies all users about new releases of the bands they are subscribed to"
 )]
-class NotificationCommand extends Command
+class NotificationCommand extends Command implements ServiceSubscriberInterface
 {
     public function __construct(
-        private readonly BandRepository $bandRepository,
-        private readonly UserRepository $userRepository,
-        private readonly UserNotifiersParser $parser,
-        private readonly LastFmDbAdapter $lastFmDbAdapter,
+        private BandRepository $bandRepository,
+        private UserNotifiersParser $parser,
+        private ContainerInterface $locator,
     )
     {
         parent::__construct();
@@ -43,7 +43,7 @@ class NotificationCommand extends Command
                     $notifiers = $this->parser->parseNotifiers($subscriber);
 
                     foreach ($notifiers as $notifier) {
-                        $notifier->notify($subscriber, $band->getLastAlbum());
+                        $this->locator->get($notifier)->notify($subscriber, $band->getLastAlbum());
                     }
                 }
             }
@@ -53,5 +53,13 @@ class NotificationCommand extends Command
             $output->writeln($exception->getMessage());
             return Command::FAILURE;
         }
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return [
+            EmailNotifier::class,
+            TelegramNotifier::class,
+        ];
     }
 }

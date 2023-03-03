@@ -31,7 +31,7 @@ class Album
     public function __construct(
         string $name,
         \DateTime $releaseDate,
-        int $duration,
+        int $duration = null,
         ArrayCollection $tracks = new ArrayCollection(),
     )
     {

@@ -6,9 +6,8 @@ use App\Entity\Band;
 use App\Entity\User;
 use App\Repository\BandRepository;
 use App\Repository\UserRepository;
-use App\Service\Notifier\EmailNotifier;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 

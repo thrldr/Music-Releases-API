@@ -2,6 +2,8 @@
 
 namespace App\Command;
 
+use App\Entity\Album;
+use App\Entity\Band;
 use App\Repository\BandRepository;
 use App\Service\MusicDb\MusicDbServiceInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -26,11 +28,16 @@ class UpdateBandsCommand extends Command
         $bands = $this->bandRepository->fetchAll();
         foreach ($bands as $band) {
             $latestAlbum = $this->musicDbService->getMostRecentAlbum($band);
-            if ($latestAlbum->getName() != $band->getName()) {
+            if ($this->albumIsNewLatest($latestAlbum, $band)) {
                 $band->updateLatestRelease($latestAlbum);
             }
         }
 
         return Command::SUCCESS;
+    }
+
+    private function albumIsNewLatest(Album $album, Band $band)
+    {
+        return $album->getReleaseDate() > $band->getLastAlbum()->getReleaseDate();
     }
 }

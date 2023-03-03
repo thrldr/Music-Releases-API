@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Notifier;
+namespace App\Service\Notification\Notifier;
 
 use App\Entity\Album;
 use App\Entity\User;
@@ -17,7 +17,7 @@ class EmailNotifier implements NotifierInterface
     {
     }
 
-    function notify(User $user, Album $newAlbum)
+    function notify(User $user, Album $newAlbum): void
     {
         $email = (new Email())
             ->from($this->from)
