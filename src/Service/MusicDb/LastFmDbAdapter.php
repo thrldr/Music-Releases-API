@@ -8,9 +8,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class LastFmDbAdapter implements MusicDbServiceInterface
 {
-    const API_URL = "http://ws.audioscrobbler.com/2.0/";
     public function __construct(
         private string $apiKey,
+        private string $apiUrl,
         private HttpClientInterface $httpClient,
     )
     {
@@ -20,7 +20,7 @@ class LastFmDbAdapter implements MusicDbServiceInterface
     {
         $response = $this->httpClient->request(
             "GET",
-            self::API_URL,
+            $this->apiUrl,
             ["query" => [
                 "method"  => "artist.search",
                 "artist"  => $band->getName(),
@@ -38,7 +38,7 @@ class LastFmDbAdapter implements MusicDbServiceInterface
     {
         $lastestAlbums = $this->httpClient->request(
             "GET",
-            self::API_URL,
+            $this->apiUrl,
             ["query" => [
                 "method"  => "artist.getTopAlbums",
                 "artist"  => $band->getName(),
