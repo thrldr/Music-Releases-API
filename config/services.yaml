@@ -26,9 +26,15 @@ services:
             $subject: '%env(EMAIL_SUBJECT)%'
 
     app.music_db.lastfm:
-        class: App\Service\MusicDb\LastFmDbAdapter
+        class: App\Service\MusicDb\LastFmDb
         arguments:
             $apiKey: '%env(API_KEY)%'
-            $apiUrl: '%env(API_URL)%'
 
-    App\Service\MusicDb\MusicDbServiceInterface: '@app.music_db.lastfm'
+    app.music_db.discogs:
+        class: App\Service\MusicDb\Discogs\DiscogsDb
+        arguments:
+            $apiKey: "SHURDELOvxTcQqTuxtnw"
+            $apiSecret: "iAenJDGMGvvNkJfDCAJvxvqBZmEtddoQ"
+
+    App\Service\MusicDb\Discogs\DiscogsDb: '@app.music_db.discogs'
+    App\Service\MusicDb\MusicDbServiceInterface: '@app.music_db.discogs'

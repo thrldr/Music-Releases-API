@@ -25,6 +25,7 @@ class UpdateBandsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /*
         $bands = $this->bandRepository->fetchAll();
         foreach ($bands as $band) {
             $latestAlbum = $this->musicDbService->getMostRecentAlbum($band);
@@ -32,6 +33,11 @@ class UpdateBandsCommand extends Command
                 $band->updateLatestRelease($latestAlbum);
             }
         }
+        */
+        $band = new Band("Black Sabbath");
+
+        $data = $this->musicDbService->test();
+        $output->writeln(print_r($data, true));
 
         return Command::SUCCESS;
     }

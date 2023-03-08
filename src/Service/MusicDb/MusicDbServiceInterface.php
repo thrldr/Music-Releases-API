@@ -7,8 +7,8 @@ use App\Entity\Band;
 
 interface MusicDbServiceInterface
 {
-    public function bandInDb(Band $name): bool;
+    public function getBandServiceId(string $name): string;
 
     /** retrieves the latest release by a band */
-    public function getMostRecentAlbum(Band $band): ?Album;
+    public function getMostRecentAlbum(int $id): ?Album;
 }
