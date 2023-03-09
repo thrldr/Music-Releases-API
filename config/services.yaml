@@ -25,11 +25,6 @@ services:
             $from: '%env(EMAIL_FROM)%'
             $subject: '%env(EMAIL_SUBJECT)%'
 
-    app.music_db.lastfm:
-        class: App\Service\MusicDb\LastFmDb
-        arguments:
-            $apiKey: '%env(API_KEY)%'
-
     app.music_db.discogs:
         class: App\Service\MusicDb\Discogs\DiscogsDb
         arguments:

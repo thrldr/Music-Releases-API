@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Service\MusicDb\Discogs\AlbumData;
 use App\Service\MusicDb\Discogs\DiscogsDb;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -23,8 +24,10 @@ class TestCommand extends Command
     {
         try {
             $bandApiId = $this->db->getBandServiceId("Gojira");
-            $latestAlbumName = $this->db->getLatestAlbum($bandApiId);
-            $output->writeln(var_export($latestAlbumName, true));
+            $output->writeln(var_export($bandApiId, true));
+//            /** @var AlbumData $latestAlbumData */
+//            $latestAlbumData = $this->db->getLatestAlbum($bandApiId);
+//            $output->writeln(var_export($latestAlbumData, true));
             return Command::SUCCESS;
         } catch (\Exception $exception) {
             $output->writeln($exception->getMessage() . PHP_EOL);

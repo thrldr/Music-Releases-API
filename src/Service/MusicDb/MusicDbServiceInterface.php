@@ -10,5 +10,5 @@ interface MusicDbServiceInterface
     public function getBandServiceId(string $name): string;
 
     /** retrieves the latest release by a band */
-    public function getMostRecentAlbum(int $id): ?Album;
+    public function getLatestAlbum(string $bandApiId): ?Album;
 }
