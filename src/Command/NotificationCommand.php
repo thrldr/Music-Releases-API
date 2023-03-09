@@ -5,24 +5,24 @@ namespace App\Command;
 use App\Repository\BandRepository;
 use App\Service\Notification\Notifier\EmailNotifier;
 use App\Service\Notification\Notifier\TelegramNotifier;
+use App\Service\Notification\NotifierLocator;
 use App\Util\UserNotifiersParser;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 #[AsCommand(
     name: "app:notify",
     description: "The command notifies all users about new releases of the bands they are subscribed to"
 )]
-class NotificationCommand extends Command implements ServiceSubscriberInterface
+class NotificationCommand extends Command
 {
     public function __construct(
-        private BandRepository $bandRepository,
+        private BandRepository      $bandRepository,
         private UserNotifiersParser $parser,
-        private ContainerInterface $locator,
+        private NotifierLocator     $notifierLocator,
     )
     {
         parent::__construct();
@@ -43,7 +43,8 @@ class NotificationCommand extends Command implements ServiceSubscriberInterface
                     $notifiers = $this->parser->parseNotifiers($subscriber);
 
                     foreach ($notifiers as $notifier) {
-                        $this->locator->get($notifier)->notify($subscriber, $band->getLastAlbum());
+                        $notifier = $this->notifierLocator->get($notifier);
+                        $notifier->notify($subscriber, $band->getLastAlbum());
                     }
                 }
             }
@@ -53,13 +54,5 @@ class NotificationCommand extends Command implements ServiceSubscriberInterface
             $output->writeln($exception->getMessage());
             return Command::FAILURE;
         }
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        return [
-            EmailNotifier::class,
-            TelegramNotifier::class,
-        ];
     }
 }
