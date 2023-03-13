@@ -14,7 +14,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand("app:update-bands")]
 class UpdateBandsCommand extends Command
 {
-
     public function __construct(
         private readonly BandRepository $bandRepository,
         private readonly MusicDbServiceInterface $musicDbService,
@@ -25,25 +24,26 @@ class UpdateBandsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /*
         $bands = $this->bandRepository->fetchAll();
-        foreach ($bands as $band) {
-            $latestAlbum = $this->musicDbService->getMostRecentAlbum($band);
-            if ($this->albumIsNewLatest($latestAlbum, $band)) {
-                $band->updateLatestRelease($latestAlbum);
-            }
-        }
-        */
-        $band = new Band("Black Sabbath");
 
-        $data = $this->musicDbService->test();
-        $output->writeln(print_r($data, true));
+        foreach ($bands as $band) {
+            $latestAlbum = $this->musicDbService->getLatestAlbum($band->getName());
+            if ($this->albumIsNewLatest($latestAlbum, $band)) {
+                $output->writeln($band->getName() . " last album updated to " . $latestAlbum->getName());
+
+                $band->updateLatestAlbum($latestAlbum);
+                $this->bandRepository->save($band, true);
+            }
+
+            /** api requests throttling */
+            sleep(2);
+        }
 
         return Command::SUCCESS;
     }
 
     private function albumIsNewLatest(Album $album, Band $band)
     {
-        return $album->getReleaseDate() > $band->getLastAlbum()->getReleaseDate();
+        return $band->getLatestAlbum() === null or $album->getName() !== $band->getLatestAlbum()->getName();
     }
 }

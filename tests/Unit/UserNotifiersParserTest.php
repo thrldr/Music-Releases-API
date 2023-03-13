@@ -5,7 +5,7 @@ namespace App\Tests\Unit;
 use App\Entity\User;
 use App\Service\Notification\Notifier\EmailNotifier;
 use App\Service\Notification\Notifier\TelegramNotifier;
-use App\Util\UserNotifiersParser;
+use App\Service\Notification\UserNotifiersParser;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class UserNotifiersParserTest extends KernelTestCase

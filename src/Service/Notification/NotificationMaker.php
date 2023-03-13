@@ -9,7 +9,7 @@ class NotificationMaker
     public function make(Band $band): NotificationDto
     {
         $headline = $band->getName() . " released a new album!";
-        $album = $band->getLastAlbum();
+        $album = $band->getLatestAlbum();
         $body = "'" . $album->getName() . "' by " . $band->getName() . " was released on ";
         $body .= date_format($album->getReleaseDate(), "d-m-Y");
 

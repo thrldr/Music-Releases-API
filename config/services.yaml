@@ -20,6 +20,9 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    App\EventListener\ExceptionListener:
+        tags: [kernel.event_listener]
+
     App\Service\Notification\Notifier\EmailNotifier:
         arguments:
             $from: '%env(EMAIL_FROM)%'

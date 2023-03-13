@@ -22,7 +22,7 @@ class NotificationMakerTest extends KernelTestCase
     {
         $band = new Band("Burzum");
         $album = new Album("Filosofem", date_create("2013-03-15"));
-        $band->setLastAlbum($album);
+        $band->setLatestAlbum($album);
 
         $notification = new NotificationDto(
             "Burzum released a new album!",

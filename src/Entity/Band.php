@@ -19,16 +19,15 @@ class Band
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups("band")]
+    #[Groups('get_bands')]
     private ?string $name = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?Album $lastAlbum = null;
+    #[Groups('get_bands')]
+    private ?Album $latestAlbum = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?Album $previousAlbum = null;
-
-    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'subscribedBands')]
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'subscribedBands', cascade: ['persist'])]
+    #[Groups('get_bands')]
     private Collection $subscribedUsers;
 
     public function __construct(string $name)
@@ -54,25 +53,25 @@ class Band
         return $this;
     }
 
-    public function getLastAlbum(): ?Album
+    public function getLatestAlbum(): ?Album
     {
-        return $this->lastAlbum;
+        return $this->latestAlbum;
     }
 
-    public function setLastAlbum(?Album $lastAlbum): self
+    public function setLatestAlbum(?Album $latestAlbum): self
     {
-        $this->lastAlbum = $lastAlbum;
+        $this->latestAlbum = $latestAlbum;
 
         return $this;
     }
 
-    public function updateLatestRelease(Album $album)
+    public function updateLatestAlbum(Album $album)
     {
-        $this->previousAlbum = $this->lastAlbum;
-        $this->lastAlbum = $album;
+        $this->latestAlbum = $album;
 
+        /** @var User $subscriber */
         foreach ($this->subscribedUsers as $subscriber) {
-            $subscriber->setNotified(true);
+            $subscriber->setIsNotified(false);
         }
     }
 

@@ -5,16 +5,16 @@ namespace App\Controller;
 use App\Entity\Band;
 use App\Repository\BandRepository;
 use App\Service\MusicDb\MusicDbServiceInterface;
-use App\Service\Notification\NotificationMaker;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class BandController extends AbstractController
 {
-    const WRONG_BAND_NAME_MESSAGE = "Sorry, there's no band under that name";
+    const WRONG_BAND_NAME_MESSAGE = "There's no band under that name";
     const BAND_CREATED_MESSAGE = "Band successfully created";
     const BAND_DELETED_MESSAGE = "Band successfully deleted";
 
@@ -22,30 +22,17 @@ class BandController extends AbstractController
     {
     }
 
-    /** get list of bands (based on user id or not) */
-    #[Route(path: "/bands/{id}", methods: ["get"])]
-    public function bands(?int $id = null): Response
+    /** get list of bands (based on user id or all) */
+    #[Route(path: "/bands", methods: ["get"])]
+    public function bands(): Response
     {
-        if (!isset($id)) {
-            $bands = $this->bandRepository->findAll();
-            $serializedBands = [];
+        $user = $this->getUser();
+        $criteria = isset($user) ? ['email' => $user->getUserIdentifier()] : [];
 
-            foreach ($bands as $band) {
-                $subscribers = $band->getSubscribedUsers();
-
-                $subscribersArray = [];
-                foreach ($subscribers as $subscriber) {
-                    $subscribersArray[] = $subscriber->getEmail();
-                }
-                $serializedBands[] = [
-                    $band->getName() => $subscribersArray,
-                ];
-            }
-            return $this->json($serializedBands);
-        }
-
-        // TODO: add a response based on a user id
-        return $this->json([]);
+        $bands = $this->bandRepository->findBy($criteria);
+        return $this->json(["bands" => $bands], Response::HTTP_OK, [], [
+            ObjectNormalizer::GROUPS => 'get_bands',
+        ]);
     }
 
     /** create a new band */
@@ -61,12 +48,15 @@ class BandController extends AbstractController
         $bandName = $data["name"];
 
         if (!$musicDbServiceService->bandInDb($bandName)) {
-            $this->json(data: ["message" => self::WRONG_BAND_NAME_MESSAGE], status: 400);
+            $this->json([
+                "message" => self::WRONG_BAND_NAME_MESSAGE],
+                Response::HTTP_BAD_REQUEST,
+            );
         }
 
         $band = new Band($bandName);
         $latestAlbum = $musicDbServiceService->getMostRecentAlbum($band);
-        $band->setLastAlbum($latestAlbum);
+        $band->setLatestAlbum($latestAlbum);
 
         $errors = $validator->validate($band);
         if (count($errors) > 0) {

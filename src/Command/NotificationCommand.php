@@ -2,12 +2,11 @@
 
 namespace App\Command;
 
+use App\Entity\User;
 use App\Repository\BandRepository;
-use App\Service\Notification\Notifier\EmailNotifier;
-use App\Service\Notification\Notifier\TelegramNotifier;
+use App\Repository\UserRepository;
 use App\Service\Notification\NotifierLocator;
-use App\Util\UserNotifiersParser;
-use Psr\Container\ContainerInterface;
+use App\Service\Notification\UserNotifiersParser;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,6 +20,7 @@ class NotificationCommand extends Command
 {
     public function __construct(
         private BandRepository      $bandRepository,
+        private UserRepository      $userRepository,
         private UserNotifiersParser $parser,
         private NotifierLocator     $notifierLocator,
     )
@@ -39,17 +39,24 @@ class NotificationCommand extends Command
             foreach ($bands as $band) {
                 $subscribers = $band->getSubscribedUsers();
 
+                /** @var User $subscriber */
                 foreach ($subscribers as $subscriber) {
-                    $notifiers = $this->parser->parseNotifiers($subscriber);
+                    if (!$subscriber->isNotified()) {
+                        $notifiers = $this->parser->parseNotifiers($subscriber);
 
-                    foreach ($notifiers as $notifier) {
-                        $notifier = $this->notifierLocator->get($notifier);
-                        $notifier->notify($subscriber, $band->getLastAlbum());
+                        foreach ($notifiers as $notifier) {
+                            $notifier = $this->notifierLocator->get($notifier);
+                            $notifier->notify($subscriber, $band->getLatestAlbum());
+                        }
+
+                        $subscriber->setIsNotified(true);
+                        $this->userRepository->save($subscriber);
                     }
                 }
             }
 
             return Command::SUCCESS;
+
         } catch (\Exception $exception) {
             $output->writeln($exception->getMessage());
             return Command::FAILURE;

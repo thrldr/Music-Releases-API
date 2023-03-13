@@ -4,7 +4,7 @@ namespace App\Service\MusicDb\Discogs;
 
 use App\Entity\Album;
 use App\Service\MusicDb\Discogs\ResponseDto\AlbumData;
-use App\Service\MusicDb\Discogs\ResponseDto\AlbumDataUrl;
+use App\Service\MusicDb\Discogs\ResponseDto\MasterRelease;
 use App\Service\MusicDb\Discogs\ResponseDto\BandMatch;
 use App\Service\MusicDb\MusicDbServiceInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -25,10 +25,11 @@ class DiscogsDb implements MusicDbServiceInterface
     {
     }
 
-    public function getLatestAlbum(string $bandApiId): ?Album
+    public function getLatestAlbum(string $bandName): ?Album
     {
-        $latestReleaseUrl = $this->getLatestAlbumUrl($bandApiId);
-        $response = $this->requestData($latestReleaseUrl);
+        $bandApiId = $this->getBandServiceId($bandName);
+        $latestAlbumDataUrl = $this->getLatestAlbumDataUrl($bandApiId);
+        $response = $this->requestData($latestAlbumDataUrl);
 
         /** @var AlbumData $data */
         $albumDto = $this->serializer->deserialize($response, AlbumData::class, self::JSON);
@@ -37,16 +38,7 @@ class DiscogsDb implements MusicDbServiceInterface
         return $album;
     }
 
-    private function makeAlbum(AlbumData $albumData): Album
-    {
-        $album = new Album($albumData->title);
-        $releaseDate = date_create($albumData->releaseDate);
-        $album->setReleaseDate($releaseDate);
-
-        return $album;
-    }
-
-    private function getLatestAlbumUrl(string $bandApiId): string
+    private function getLatestAlbumDataUrl(string $bandApiId): string
     {
         $endpoint = self::BASE_URL . "/artists/" . $bandApiId . "/releases";
         $parameters = [
@@ -57,10 +49,14 @@ class DiscogsDb implements MusicDbServiceInterface
 
         $response = $this->requestData($endpoint, $parameters);
 
-        /** @var AlbumDataUrl $releaseInfoUrl */
-        $releaseInfoUrl = $this->serializer->deserialize($response, AlbumDataUrl::class, self::JSON);
+        /** @var MasterRelease $masterRelease */
+        $masterRelease = $this->serializer->deserialize($response, MasterRelease::class, self::JSON);
 
-        return $releaseInfoUrl->url;
+        if (isset($masterRelease->mainReleaseId)) {
+            return self::BASE_URL . "/releases/" . $masterRelease->mainReleaseId;
+        }
+
+        return $masterRelease->mainReleaseUrl;
     }
 
     public function getBandServiceId(string $bandName): string
@@ -92,6 +88,17 @@ class DiscogsDb implements MusicDbServiceInterface
             ["query" => array_merge($baseParameters, $extraParameters)],
         );
 
+        var_dump($response->getInfo()["url"]);
+
         return $response->getContent();
+    }
+
+    private function makeAlbum(AlbumData $albumData): Album
+    {
+        $album = new Album($albumData->title);
+        $releaseDate = date_create_from_format("Y-m-d", $albumData->releaseDate);
+        $album->setReleaseDate($releaseDate);
+
+        return $album;
     }
 }

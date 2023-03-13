@@ -24,13 +24,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\Email]
-    #[Groups("band")]
+    #[Groups('get_bands')]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
     #[ORM\Column(name: "notified")]
+    #[Groups('get_bands')]
     private ?bool $notified = null;
 
     #[Assert\Length(
@@ -53,7 +54,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\ManyToMany(targetEntity: Band::class, inversedBy: 'subscribedUsers')]
     #[Assert\Unique]
-    #[Groups("band")]
     private Collection $subscribedBands;
 
     public function __construct(
@@ -68,15 +68,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->subscribedBands = new ArrayCollection();
     }
 
-    public function setNotified(bool $needsNotification): self
+    public function setIsNotified(bool $userNeedsNotification): self
     {
-        $this->notified = $needsNotification;
+        $this->notified = $userNeedsNotification;
         return $this;
     }
 
-    public function needsNotification(): bool
+    public function isNotified(): bool
     {
-        return !$this->notified;
+        return $this->notified;
     }
 
     public function getPlainPassword()
@@ -97,13 +97,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getEmail(): ?string
     {
         return $this->email;
-    }
-
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
-
-        return $this;
     }
 
     /**

@@ -7,6 +7,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 class AlbumData
 {
     #[SerializedName("released")]
-    public string $releaseDate;
-    public string $title;
+    public null|string|int $releaseDate = null;
+
+    public ?string $title = null;
 }

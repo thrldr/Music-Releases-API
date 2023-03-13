@@ -7,7 +7,7 @@ use App\Entity\Band;
 
 interface MusicDbServiceInterface
 {
-    public function getBandServiceId(string $name): string;
+    public function getBandServiceId(string $bandName): string;
 
     /** retrieves the latest release by a band */
     public function getLatestAlbum(string $bandApiId): ?Album;
