@@ -5,7 +5,7 @@ namespace App\Service\MusicDb;
 use App\Entity\Album;
 use App\Entity\Band;
 
-interface MusicDbServiceInterface
+interface RemoteMusicDbInterface
 {
     public function getBandServiceId(string $bandName): string;
 

@@ -4,11 +4,11 @@ namespace App\Tests;
 
 use App\Entity\Album;
 use App\Entity\Band;
-use App\Service\MusicDb\MusicDbServiceInterface;
+use App\Service\MusicDb\RemoteMusicDbInterface;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
 #[When(env: "dev")]
-class MockMusicDbService implements MusicDbServiceInterface
+class MockRemoteMusicDb implements RemoteMusicDbInterface
 {
     const MOCK_BANDS = ["Burzum", "Aphex Twin", "Miles Davis", "Black Sabbath"];
     const MOCK_ALBUMS = ["Filosofem", "Drukqs", "Kind Of Blue", "Paranoid"];

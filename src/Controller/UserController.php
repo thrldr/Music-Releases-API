@@ -14,7 +14,6 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 
 class UserController extends AbstractController
 {
-    const ALL_USERS_REMOVED_MESSAGE = "all users are removed";
     const USER_SUBSCRIBED_BAND_MESSAGE = "user subscribed to a band";
     const NO_SUCH_BAND_MESSAGE = "no band under this name";
 
@@ -25,19 +24,8 @@ class UserController extends AbstractController
     {
     }
 
-    /** deletes all users */
-    #[Route(path: "/users", methods: ["delete"])]
-    public function clear(): Response
-    {
-        $users = $this->userRepository->findAll();
-        foreach ($users as $user) {
-            $this->userRepository->remove($user, true);
-        }
-        return $this->json(["message" => self::ALL_USERS_REMOVED_MESSAGE]);
-    }
-
     /** lists the authenticated user's bands */
-    #[Route(path: "/user", methods: ["get"])]
+    #[Route(path: "/user/{id}", methods: ["get"])]
     public function user(): Response
     {
         $user = $this->getUser();

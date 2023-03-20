@@ -5,7 +5,7 @@ namespace App\Command;
 use App\Repository\AlbumRepository;
 use App\Repository\BandRepository;
 use App\Service\MusicDb\Discogs\AlbumData;
-use App\Service\MusicDb\Discogs\DiscogsDb;
+use App\Service\MusicDb\Discogs\DiscogsDbRemote;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,9 +16,9 @@ class TestCommand extends Command
 {
 
     public function __construct(
-        private readonly BandRepository $bandRepository,
+        private readonly BandRepository  $bandRepository,
         private readonly AlbumRepository $albumRepository,
-        private readonly DiscogsDb $db,
+        private readonly DiscogsDbRemote $db,
     )
     {
         parent::__construct();

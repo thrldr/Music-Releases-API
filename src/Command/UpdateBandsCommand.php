@@ -5,7 +5,7 @@ namespace App\Command;
 use App\Entity\Album;
 use App\Entity\Band;
 use App\Repository\BandRepository;
-use App\Service\MusicDb\MusicDbServiceInterface;
+use App\Service\MusicDb\RemoteMusicDbInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,8 +15,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 class UpdateBandsCommand extends Command
 {
     public function __construct(
-        private readonly BandRepository $bandRepository,
-        private readonly MusicDbServiceInterface $musicDbService,
+        private readonly BandRepository         $bandRepository,
+        private readonly RemoteMusicDbInterface $musicDbService,
     )
     {
         parent::__construct();

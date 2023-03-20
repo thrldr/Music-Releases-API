@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class SecurityController extends AbstractController
+class RegistrationController extends AbstractController
 {
     const SUCCESSFUL_REGISTRATION_MESSAGE = "User successfully registered";
 

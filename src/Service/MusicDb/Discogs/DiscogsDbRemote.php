@@ -3,14 +3,15 @@
 namespace App\Service\MusicDb\Discogs;
 
 use App\Entity\Album;
+use App\Entity\Band;
 use App\Service\MusicDb\Discogs\ResponseDto\AlbumData;
 use App\Service\MusicDb\Discogs\ResponseDto\MasterRelease;
 use App\Service\MusicDb\Discogs\ResponseDto\BandMatch;
-use App\Service\MusicDb\MusicDbServiceInterface;
+use App\Service\MusicDb\RemoteMusicDbInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class DiscogsDb implements MusicDbServiceInterface
+class DiscogsDbRemote implements RemoteMusicDbInterface
 {
     const GET = 'GET';
     const JSON = 'json';
