@@ -21,7 +21,8 @@ services:
             - '../src/Kernel.php'
 
     App\EventListener\ExceptionListener:
-        tags: [kernel.event_listener]
+#        tags:
+#            - { name: 'kernel.event_listener', method: 'onException'}
 
     App\Service\Notification\Notifier\EmailNotifier:
         arguments:
@@ -31,8 +32,8 @@ services:
     app.music_db.discogs:
         class: App\Service\MusicDb\Discogs\DiscogsDb
         arguments:
-            $apiKey: "SHURDELOvxTcQqTuxtnw"
-            $apiSecret: "iAenJDGMGvvNkJfDCAJvxvqBZmEtddoQ"
+            $apiKey: '%env(API_KEY)%'
+            $apiSecret: '%env(API_SECRET)%'
 
     App\Service\MusicDb\Discogs\DiscogsDb: '@app.music_db.discogs'
     App\Service\MusicDb\MusicDbServiceInterface: '@app.music_db.discogs'

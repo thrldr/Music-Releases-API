@@ -4,11 +4,16 @@ namespace App\Controller;
 
 use App\Entity\Band;
 use App\Repository\BandRepository;
+use App\Repository\UserRepository;
 use App\Service\MusicDb\MusicDbServiceInterface;
+use Doctrine\DBAL\Exception\DatabaseObjectNotFoundException;
+use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -18,18 +23,25 @@ class BandController extends AbstractController
     const BAND_CREATED_MESSAGE = "Band successfully created";
     const BAND_DELETED_MESSAGE = "Band successfully deleted";
 
-    public function __construct(private BandRepository $bandRepository)
+    public function __construct(
+        private BandRepository $bandRepository,
+        private UserRepository $userRepository,
+    )
     {
     }
 
-    /** get list of bands (based on user id or all) */
+    /** list subscribed bands of the authenticated user */
     #[Route(path: "/bands", methods: ["get"])]
     public function bands(): Response
     {
         $user = $this->getUser();
-        $criteria = isset($user) ? ['email' => $user->getUserIdentifier()] : [];
+        if ($user === null) {
+            throw new TokenNotFoundException();
+        }
 
-        $bands = $this->bandRepository->findBy($criteria);
+        $userEntity = $this->userRepository->fetchOneByEmail($user->getUserIdentifier());
+        $bands = $userEntity->getSubscribedBands();
+
         return $this->json(["bands" => $bands], Response::HTTP_OK, [], [
             ObjectNormalizer::GROUPS => 'get_bands',
         ]);

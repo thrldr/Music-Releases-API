@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints as DoctrineAssert;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -24,14 +25,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\Email]
-    #[Groups('get_bands')]
+    #[Groups('credentials')]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
     #[ORM\Column(name: "notified")]
-    #[Groups('get_bands')]
+    #[Assert\NotNull]
     private ?bool $notified = null;
 
     #[Assert\Length(
@@ -40,11 +41,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         minMessage: 'Your password must be at least {{ limit }} characters long',
         maxMessage: 'Your password cannot be longer than {{ limit }} characters',
     )]
+    #[Groups('credentials')]
+    #[SerializedName('password')]
     private ?string $plainPassword = null;
 
     /**
      * a binary array of notifiers
-     * @see App\Services\Notifiers\Parser\UserNotificationServicesParser
+     * @see App\Service\Notification\UserNotificationServicesParser
      */
     #[ORM\Column(name: "notifiers", type: 'integer')]
     private int $notifiers = 0;
@@ -68,9 +71,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->subscribedBands = new ArrayCollection();
     }
 
-    public function setIsNotified(bool $userNeedsNotification): self
+    public function setIsNotified(bool $userNotified): self
     {
-        $this->notified = $userNeedsNotification;
+        $this->notified = $userNotified;
         return $this;
     }
 

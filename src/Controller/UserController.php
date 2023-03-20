@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 
 class UserController extends AbstractController
 {
@@ -40,6 +41,9 @@ class UserController extends AbstractController
     public function user(): Response
     {
         $user = $this->getUser();
+        if ($user === null) {
+            throw new TokenNotFoundException("No access token provided");
+        }
         $bands = $user->getSubscribedBands();
         $bandsArray = array_map((fn(Band $band) => $band->getName()), $bands->toArray());
         return $this->json([$user->getEmail() => $bandsArray]);
@@ -51,7 +55,7 @@ class UserController extends AbstractController
     {
         $users = $this->userRepository->fetchAll();
         return $this->json($users, Response::HTTP_OK,
-            context: ['groups' => ['band']]
+            ['groups' => ['band']]
         );
     }
 

@@ -27,7 +27,6 @@ class Band
     private ?Album $latestAlbum = null;
 
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'subscribedBands', cascade: ['persist'])]
-    #[Groups('get_bands')]
     private Collection $subscribedUsers;
 
     public function __construct(string $name)
